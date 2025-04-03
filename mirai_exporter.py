@@ -69,9 +69,11 @@ def raycast_screenshot(self,context):
 
     # Hide the rooms
 
-    bpy.context.view_layer.layer_collection.children["rooms"].hide_viewport = True
     bpy.context.view_layer.layer_collection.children["raycast"].hide_viewport = False
     bpy.context.view_layer.layer_collection.children["Collection"].hide_viewport = False  
+    for collection in bpy.context.view_layer.layer_collection.children:
+        if collection.name == "rooms":
+            collection.hide_viewport = True
 
     #Set the raycast to show wireframe
     bpy.data.objects["raycast"].select_set(True)
@@ -130,9 +132,11 @@ def rooms_screenshot(self,context):
 
     # Hide the raycast
 
-    bpy.context.view_layer.layer_collection.children["raycast"].hide_viewport = True
     bpy.context.view_layer.layer_collection.children["rooms"].hide_viewport = False
     bpy.context.view_layer.layer_collection.children["Collection"].hide_viewport = False
+    for collection in bpy.context.view_layer.layer_collection.children:
+        if collection.name == "raycast" :
+            collection.hide_viewport = True
             
     # Take Screenshot for Rooms
     bpy.context.scene.render.filepath = os.path.join(basedir+'Screenshot_'+filename+'_Rooms')
@@ -526,7 +530,28 @@ class center_origins (bpy.types.Operator):
     def execute(self, context):
         from mathutils import Vector
         
+        #deselect all
+            
+        def get_outliner_area():
+            if bpy.context.area.type!='OUTLINER':
+                for area in bpy.context.screen.areas:
+                    if area.type == 'OUTLINER':
+                        return area
 
+        area = get_outliner_area()
+        region = next(region for region in area.regions if region.type == "WINDOW")
+
+        with bpy.context.temp_override(area=area, reigon=region):
+            bpy.ops.outliner.unhide_all()
+            bpy.ops.object.select_all(action='DESELECT') 
+            bpy.context.view_layer.layer_collection.children["rooms"].hide_viewport = False
+            bpy.context.view_layer.layer_collection.children["raycast"].hide_viewport = True
+            bpy.context.view_layer.layer_collection.children["Collection"].hide_viewport = True
+         
+            # Select all rooms objects
+            bpy.context.view_layer.objects.active = bpy.data.objects['Cube'] 
+            bpy.ops.object.select_all(action='SELECT') 			
+            
         def calcBoundingBox(mesh_objs):
             cornerApointsX = []
             cornerApointsY = []
@@ -587,6 +612,7 @@ class center_origins (bpy.types.Operator):
                             bpy.ops.object.origin_set(type='ORIGIN_CURSOR', center='MEDIAN')
                             bpy.ops.view3d.snap_cursor_to_center()
                             bpy.ops.view3d.snap_selected_to_cursor(use_offset=False)
+                            bpy.context.scene.transform_orientation_slots[0].type = 'GLOBAL'
                             bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='MEDIAN')
         return {'FINISHED'}            # Lets Blender know the operator finished successfully.
      
@@ -600,11 +626,9 @@ class apply_mod(bpy.types.Operator):
     def execute(self, context):        # execute() is called when running the operator.
 
         # The original script
-        obj = bpy.context.object  #this plug in have to use this code to work
-        # obj = bpy.context.active_object  --> this plugin will not work with this
-        #deselect all        
-        for obj in bpy.data.objects:
-            obj.select_set(False)
+
+
+            
         def get_outliner_area():
             if bpy.context.area.type!='OUTLINER':
                 for area in bpy.context.screen.areas:
@@ -614,13 +638,18 @@ class apply_mod(bpy.types.Operator):
         area = get_outliner_area()
         region = next(region for region in area.regions if region.type == "WINDOW")
 
-        with bpy.context.temp_override(area=area, reigon=region):        
+        with bpy.context.temp_override(area=area, reigon=region):
+            bpy.ops.outliner.unhide_all()
+            bpy.ops.object.select_all(action='DESELECT') 
             bpy.context.view_layer.layer_collection.children["rooms"].hide_viewport = False
             bpy.context.view_layer.layer_collection.children["raycast"].hide_viewport = True
-            bpy.context.view_layer.layer_collection.children["Collection"].hide_viewport = True             
-
-            # Select all objects
-            bpy.ops.object.select_all(action='SELECT') 					
+            bpy.context.view_layer.layer_collection.children["Collection"].hide_viewport = True
+         
+            # Select all rooms objects
+            bpy.context.view_layer.objects.active = bpy.data.objects['Cube'] 
+            obj = bpy.context.object  #this plug in have to use this code to work
+            #obj = bpy.context.active_object  --> this plugin will not work with this
+            bpy.ops.object.select_all(action='SELECT') 			
         if obj and obj.type == 'MESH':
             bpy.ops.object.convert(target='MESH')
             bpy.ops.object.select_all(action='SELECT')
@@ -644,8 +673,8 @@ class apply_mod(bpy.types.Operator):
         #unhide all objects
         for obj in bpy.data.objects:
             obj.hide_set(False)
-            bpy.data.collections["Collection"].hide_select = True
-            bpy.data.collections["raycast"].hide_select = True
+            bpy.data.collections["Collection"].hide_viewport = False
+            bpy.data.collections["raycast"].hide_viewport = False
 
         return {'FINISHED'}            # Lets Blender know the operator finished successfully.
                                              
