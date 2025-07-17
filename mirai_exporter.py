@@ -1,18 +1,7 @@
 bl_info = {
     "name": "Mirai Export",
     "author": "Amadeo Delgado Casado, Long H B, Minh Nguyen",
-    "version": (1, 0),
-    "blender": (4, 2, 0),
-    "location": "View3D > Add > Mesh > New Object",
-    "description": "Unified tool for exporting",
-    "warning": "",
-    "doc_url": "",
-    "category": "Mirai Tools",
-}
-bl_info = {
-    "name": "Mirai Export",
-    "author": "Amadeo Delgado Casado, Long H B, Minh Nguyen",
-    "version": (1, 0),
+    "version": (2, 0),
     "blender": (4, 2, 0),
     "location": "View3D > Add > Mesh > New Object",
     "description": "Unified tool for exporting",
@@ -78,7 +67,6 @@ def raycast_screenshot(self,context):
     #Set the raycast to show wireframe
     bpy.data.objects["raycast"].select_set(True)
     # to select the object in the 3D viewport,
-
     current_state = bpy.data.objects["raycast"].select_get()
     # retrieving the current state
 
@@ -130,9 +118,12 @@ def rooms_screenshot(self,context):
                         space.overlay.show_stats = False
                         space.overlay.show_statvis = False
 
-    # Hide the raycast
+   
+    
 
+    # Hide the raycast
     bpy.context.view_layer.layer_collection.children["rooms"].hide_viewport = False
+    
     bpy.context.view_layer.layer_collection.children["Collection"].hide_viewport = False
     for collection in bpy.context.view_layer.layer_collection.children:
         if collection.name == "raycast" :
@@ -311,43 +302,6 @@ def create_raycast_material():
     
     return material
 
-def destroy_measure_cube(self,context):
-    if "MeasureCube" in bpy.data.objects:
-        bpy.data.objects.remove(bpy.data.objects["MeasureCube"])
-    return {'FINISHED'}
-
-def create_measure_cube(self,context):
-    if "MeasureCube" in bpy.data.objects:
-        return bpy.data.objects["MeasureCube"]
-    
-    bpy.ops.mesh.primitive_cube_add(size=2)
-    cube = bpy.context.object
-    cube.name = "MeasureCube"
-
-    # Link the object to the scene collection
-    bpy.context.collection.objects.link(bpy.data.objects["MeasureCube"])
-    return {'FINISHED'}
-    
-    
-    # # Create a new mesh
-    # mesh = bpy.data.meshes.new(name="MeasureCubeMesh")
-    
-    # # Create a new object with the mesh
-    # obj = bpy.data.objects.new(name="MeasureCube", object_data=mesh)
-    
-    # # Link the object to the scene collection
-    # bpy.context.collection.objects.link(obj)
-    
-    # # Set the object as the active object
-    # bpy.context.view_layer.objects.active = obj
-    
-    # # Select the object
-    # obj.select_set(True)
-    
-    # # Set the object's location and scale
-    # obj.location = (0, 0, 100)
-    # obj.scale = (1, 1, 1)                                       
-
 def is_collection_empty(self,conetext,name):
     if name in bpy.data.collections:
         if len(bpy.data.collections[name].objects) == 0:
@@ -363,121 +317,59 @@ def check_collections(self,context):
                         if space.type == 'VIEW_3D': # check if space is a 3D view
                             space.overlay.show_floor = True
                             space.overlay.show_ortho_grid = True
-
-        #create cube
-        bpy.ops.mesh.primitive_cube_add(size=2, enter_editmode=False, align='WORLD', location=(0, 0, 0), scale=(1, 1, 1))
-
-        obj = bpy.context.object
-
-        for obj in bpy.context.selected_objects:
-            obj.name = "Cube"
-            
-        bpy.context.object.show_wire = True
-
-        #Set Material
-
-        ob = bpy.context.active_object
-
-        # Get material
-        mat = bpy.data.materials.get("Material")
-        if mat is None:
-            # create material
-            mat = bpy.data.materials.new(name="Material")
-
-        # Assign it to object
-        if ob.data.materials:
-            # assign to 1st material slot
-            ob.data.materials[0] = mat
-        else:
-            # no slots
-            ob.data.materials.append(mat)
-
-
-        obj = bpy.context.object
-        if obj and obj.type == 'MESH':
-            for slot in obj.material_slots:
-                material = slot.material
-
-
-
-        # Get the selected object
-
-        obj = bpy.context.object
-
-        bpy.context.object.active_material.use_nodes = True
-
-        if obj and obj.type == 'MESH':
-
-                    # Get the material's node tree
-
-                    nodes = material.node_tree.nodes
-
-                    
-
-                    # Find the principled shader node
-
-                    principled_node = None
-
-                    for node in nodes:
-
-                        if node.type == 'BSDF_PRINCIPLED':
-
-                            principled_node = node
-
-                            break
-
-                    
-        if principled_node:
-            principled_node.inputs['Base Color'].default_value = (0, 0.799104, 0.0137023, 0.4)
-            principled_node.inputs['Alpha'].default_value = 0.4
-
-            # Set the color to green and alpha value to 0.4
-
-            material.diffuse_color = (0, 0.799104, 0.0137023, 0.4)
-            
-            
         #Create "rooms" Collection and assign the cube to it
-
-        collection = bpy.data.collections.new("rooms")
-        bpy.context.scene.collection.children.link(collection)
-        # our created cube is the active one
-        ob = bpy.context.active_object
-        # Remove object from all collections not used in a scene
-        bpy.ops.collection.objects_remove_all()
-        # add it to our specific collection
-        bpy.data.collections['rooms'].objects.link(ob)
-
-
-
-        #create raycast cube
-        bpy.ops.mesh.primitive_cube_add(size=2, enter_editmode=False, align='WORLD', location=(0, 0, 0), scale=(1, 1, 1))
-
-        obj = bpy.context.object
-
-        for obj in bpy.context.selected_objects:
-            obj.name = "raycast"
+        if "rooms" not in bpy.data.collections:
             
-        bpy.context.object.show_wire = True
+            #create cube
+            bpy.ops.mesh.primitive_cube_add(size=2, enter_editmode=False, align='WORLD', location=(0, 0, 0), scale=(1, 1, 1))
 
-         
-            
+            obj = bpy.context.object
+            material = create_material_with_texture()
+            for obj in bpy.context.selected_objects:
+                obj.name = "Cube"
+                bpy.context.object.show_wire = True
+                bpy.ops.object.mode_set(mode='OBJECT', toggle=True)
+                obj.data.name = "Cube"
+                bpy.context.view_layer.objects.active = obj
+                bpy.ops.object.mode_set(mode='EDIT')
+                bpy.ops.mesh.select_all(action='SELECT')
+                bpy.ops.uv.reset()
+                bpy.ops.object.mode_set(mode='OBJECT')
+                #Adds material to the object
+                if len(obj.data.materials) > 0:
+                    obj.data.materials[0] = material
+                else:
+                    obj.data.materials.append(material)
+        
+            collection = bpy.data.collections.new("rooms")
+            bpy.context.scene.collection.children.link(collection)
+            # our created cube is the active one
+            ob = bpy.context.active_object
+            # Remove object from all collections not used in a scene
+            bpy.ops.collection.objects_remove_all()
+            # add it to our specific collection
+            bpy.data.collections['rooms'].objects.link(ob)
+
         #Create "raycast" Collection and assign the cube to it
+        if "raycast" not in bpy.data.collections:
+            bpy.ops.mesh.primitive_cube_add(size=2, enter_editmode=False, align='WORLD', location=(0, 0, 0), scale=(1, 1, 1))
 
-        collection = bpy.data.collections.new("raycast")
-        bpy.context.scene.collection.children.link(collection)
-        # our created cube is the active one
-        ob = bpy.context.active_object
-        # Remove object from all collections not used in a scene
-        bpy.ops.collection.objects_remove_all()
-        # add it to our specific collection
-        bpy.data.collections['raycast'].objects.link(ob)
+            obj = bpy.context.object
+
+            for obj in bpy.context.selected_objects:
+                obj.name = "raycast"
+                bpy.context.object.show_wire = True
+            # create collection
+            collection = bpy.data.collections.new("raycast")
+            bpy.context.scene.collection.children.link(collection)
+            # our created cube is the active one
+            ob = bpy.context.active_object
+            # Remove object from all collections not used in a scene
+            bpy.ops.collection.objects_remove_all()
+            # add it to our specific collection
+            bpy.data.collections['raycast'].objects.link(ob)
 
         return {'FINISHED'}            # Lets Blender know the operator finished successfully.
-
-
-
-  
-    
 
 #METHODS----------------- 
 
@@ -494,168 +386,50 @@ class Initial_setup(bpy.types.Operator):
 
         return {'FINISHED'}            # Lets Blender know the operator finished successfully.
 
-
 class fix_rooms(bpy.types.Operator):
-        bl_label = "Fix rooms"
-        bl_idname = "opr.fix_rooms_operator"
-        bl_options = {'REGISTER', 'UNDO'}
-
-        def execute(self, context):
-            #Set Material
-            material = create_material_with_texture()
-            #Reset UVs of all objects in rooms
-            for obj in bpy.data.objects:
-                obj.select_set(False)
-            for obj in bpy.data.collections["rooms"].objects:
-                bpy.ops.object.mode_set(mode='OBJECT', toggle=True)
-                obj.name = "Cube"
-                bpy.context.view_layer.objects.active = obj
-                bpy.ops.object.mode_set(mode='EDIT')
-                bpy.ops.mesh.select_all(action='SELECT')
-                bpy.ops.uv.reset()
-                bpy.ops.object.mode_set(mode='OBJECT')
-
-                #Adds material to the object
-                if len(obj.data.materials) > 0:
-                    obj.data.materials[0] = material
-                else:
-                    obj.data.materials.append(material)
-                    return {'FINISHED'}
-        
-class center_origins (bpy.types.Operator):
-    bl_label = "Center origins"
-    bl_idname = "opr.center_origins_operator"
+    bl_label = "Fix rooms"
+    bl_idname = "opr.fix_rooms_operator"
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        from mathutils import Vector
-        
-        #deselect all
-            
-        def get_outliner_area():
-            if bpy.context.area.type!='OUTLINER':
-                for area in bpy.context.screen.areas:
-                    if area.type == 'OUTLINER':
-                        return area
-
-        area = get_outliner_area()
-        region = next(region for region in area.regions if region.type == "WINDOW")
-
-        with bpy.context.temp_override(area=area, reigon=region):
-            bpy.ops.outliner.unhide_all()
-            bpy.ops.object.select_all(action='DESELECT') 
-            bpy.context.view_layer.layer_collection.children["rooms"].hide_viewport = False
-            bpy.context.view_layer.layer_collection.children["raycast"].hide_viewport = True
-            bpy.context.view_layer.layer_collection.children["Collection"].hide_viewport = True
-         
-            # Select all rooms objects
-            bpy.context.view_layer.objects.active = bpy.data.objects['Cube'] 
-            bpy.ops.object.select_all(action='SELECT') 			
-            
-        def calcBoundingBox(mesh_objs):
-            cornerApointsX = []
-            cornerApointsY = []
-            cornerApointsZ = []
-            cornerBpointsX = []
-            cornerBpointsY = []
-            cornerBpointsZ = []
-            
-            for ob in mesh_objs:
-                bbox_corners = [ob.matrix_world @ Vector(corner)  for corner in ob.bound_box]
-                cornerApointsX.append(bbox_corners[0].x)
-                cornerApointsY.append(bbox_corners[0].y)
-                cornerApointsZ.append(bbox_corners[0].z)
-                cornerBpointsX.append(bbox_corners[6].x)
-                cornerBpointsY.append(bbox_corners[6].y)
-                cornerBpointsZ.append(bbox_corners[6].z)
-                
-            minA = Vector((min(cornerApointsX), min(cornerApointsY), min(cornerApointsZ)))
-            maxB = Vector((max(cornerBpointsX), max(cornerBpointsY), max(cornerBpointsZ)))
-            maxA = Vector((max(cornerApointsX), max(cornerApointsY), max(cornerApointsZ)))
-
-            center_point = Vector(((minA.x + maxB.x)/2, (minA.y + maxB.y)/2, (minA.z + maxB.z)/2))
-            dimensions =  Vector((maxB.x - maxA.x, maxB.y - maxA.y, maxB.z - maxA.z))
-            #dimensions =  Vector((maxB.x - minA.x, maxB.y - minA.y, maxB.z - minA.z))
-            
-            return center_point, dimensions
-
-        mesh_objs = [obj for obj in bpy.context.selected_objects if obj.type == 'MESH'] 
-        center_point, dimensions = calcBoundingBox(mesh_objs)
-
-
-        context = bpy.context
-        scene = context.scene 
-        scene.cursor.location = (center_point)
-
-
-        # Unhide all
-        def get_outliner_area():
-            if bpy.context.area.type!='OUTLINER':
-                for area in bpy.context.screen.areas:
-                    if area.type == 'OUTLINER':
-                        return area
-
-        area = get_outliner_area()
-        region = next(region for region in area.regions if region.type == "WINDOW")
-
-        with bpy.context.temp_override(area=area, reigon=region):
-            bpy.ops.outliner.unhide_all()
-            
-        # Select all objects
-        bpy.ops.object.select_all(action='SELECT') 
-
-        for window in bpy.context.window_manager.windows:
-            for area in window.screen.areas: # iterate through areas in current screen
-                if area.type == 'VIEW_3D':
-                    for space in area.spaces: # iterate through spaces in current VIEW_3D area
-                        if space.type == 'VIEW_3D': # check if space is a 3D view
-                            bpy.ops.object.origin_set(type='ORIGIN_CURSOR', center='MEDIAN')
-                            bpy.ops.view3d.snap_cursor_to_center()
-                            bpy.ops.view3d.snap_selected_to_cursor(use_offset=False)
-                            bpy.context.scene.transform_orientation_slots[0].type = 'GLOBAL'
-                            bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='MEDIAN')
-        return {'FINISHED'}            # Lets Blender know the operator finished successfully.
-     
-class apply_mod(bpy.types.Operator):
-    """Apply Rooms modifers to the selectect object"""      # Use this as a tooltip for menu items and buttons.
-      
-    bl_label = "Apply Rooms modifiers"
-    bl_idname = "opr.center_oporigins_operator"       
-    bl_options = {'REGISTER', 'UNDO'}  
-
-    def execute(self, context):        # execute() is called when running the operator.
-
-        # The original script
-
-
-            
-        def get_outliner_area():
-            if bpy.context.area.type!='OUTLINER':
-                for area in bpy.context.screen.areas:
-                    if area.type == 'OUTLINER':
-                        return area
-
-        area = get_outliner_area()
-        region = next(region for region in area.regions if region.type == "WINDOW")
-
-        with bpy.context.temp_override(area=area, reigon=region):
-            bpy.ops.outliner.unhide_all()
-            bpy.ops.object.select_all(action='DESELECT') 
-            bpy.context.view_layer.layer_collection.children["rooms"].hide_viewport = False
-            bpy.context.view_layer.layer_collection.children["raycast"].hide_viewport = True
-            bpy.context.view_layer.layer_collection.children["Collection"].hide_viewport = True
-         
-            # Select all rooms objects
-            bpy.context.view_layer.objects.active = bpy.data.objects['Cube'] 
-            obj = bpy.context.object  #this plug in have to use this code to work
-            #obj = bpy.context.active_object  --> this plugin will not work with this
-            bpy.ops.object.select_all(action='SELECT') 			
-        if obj and obj.type == 'MESH':
-            bpy.ops.object.convert(target='MESH')
-            bpy.ops.object.select_all(action='SELECT')
-            bpy.ops.object.editmode_toggle()
+        #Reset uvs of all objetcs in rooms
+        material = create_material_with_texture()
+        #Sets materials
+        for obj in bpy.data.collections["rooms"].objects:
+            bpy.context.view_layer.objects.active = obj
+            bpy.ops.object.mode_set(mode='EDIT')
             bpy.ops.mesh.select_all(action='SELECT')
             bpy.ops.uv.reset()
+            bpy.ops.object.mode_set(mode='OBJECT')
+
+            #Adds material to the object
+            if len(obj.data.materials) > 0:
+                obj.data.materials[0] = material
+            else:
+                obj.data.materials.append(material)
+        
+                #deselect all
+            
+        def get_outliner_area():
+            if bpy.context.area.type!='OUTLINER':
+                for area in bpy.context.screen.areas:
+                    if area.type == 'OUTLINER':
+                        return area
+
+        area = get_outliner_area()
+        region = next(region for region in area.regions if region.type == "WINDOW")
+
+        with bpy.context.temp_override(area=area, reigon=region):
+            bpy.ops.outliner.unhide_all()
+            bpy.ops.object.select_all(action='DESELECT') 
+            bpy.context.view_layer.layer_collection.children["rooms"].hide_viewport = False
+        #Select all rooms objects
+        for obj in bpy.data.collections['rooms'].all_objects:
+            obj.select_set(True) 
+            bpy.ops.object.join() #Join all rooms
+            obj = bpy.context.object  
+            bpy.ops.object.editmode_toggle()
+            bpy.ops.mesh.remove_doubles()
             bpy.ops.mesh.separate(type='LOOSE')
             bpy.ops.object.editmode_toggle()
             
@@ -666,43 +440,10 @@ class apply_mod(bpy.types.Operator):
                             for space in area.spaces: # iterate through spaces in current VIEW_3D area
                                 if space.type == 'VIEW_3D': # check if space is a 3D view
                                     bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='MEDIAN')
-                                    #set face snap and origins select     
-                                    bpy.context.scene.tool_settings.snap_elements_individual = {'FACE_NEAREST'}
-                                    bpy.context.scene.tool_settings.use_snap = True
-                                    bpy.context.scene.tool_settings.use_transform_data_origin = True
-        #unhide all objects
-        for obj in bpy.data.objects:
-            obj.hide_set(False)
-            bpy.data.collections["Collection"].hide_viewport = False
-            bpy.data.collections["raycast"].hide_viewport = False
 
-        return {'FINISHED'}            # Lets Blender know the operator finished successfully.
-                                             
-
-               
-
-class add_cube(bpy.types.Operator):
-    bl_label = "Add cube"
-    bl_idname = "opr.add_cube_operator"
-    bl_options = {'REGISTER', 'UNDO'}
-    
-    #Adds a cube in the position 0,0,100
-    def execute(self, context):
-        
-        #Check if the cube exists
-        if "MeasureCube" in bpy.data.objects:
-            #Delete the cube
-            bpy.data.objects.remove(bpy.data.objects["MeasureCube"])
-        
-        bpy.ops.mesh.primitive_cube_add(size=2)
-        cube = bpy.context.object
-        cube.name = "MeasureCube"
-
-        #Moves it to the position 0,0,100
-        cube.location = (0, 0, 100)
-        
-
-        return {'FINISHED'}                                   
+            
+        return {'FINISHED'}         
+                
 
 class export_mirai(bpy.types.Operator):
     """Checks uvs of the cubes, sets up collections and exports to MiraiTwin"""
@@ -720,7 +461,7 @@ class export_mirai(bpy.types.Operator):
     # Remove .blend extension:
         filename = os.path.splitext(filename)[0]
         
-                # Unhide all
+                # Unhide all and set selectable all
         def get_outliner_area():
             if bpy.context.area.type!='OUTLINER':
                 for area in bpy.context.screen.areas:
@@ -731,28 +472,49 @@ class export_mirai(bpy.types.Operator):
         region = next(region for region in area.regions if region.type == "WINDOW")
 
         with bpy.context.temp_override(area=area, reigon=region):
-            bpy.ops.outliner.unhide_all()  
+            bpy.ops.outliner.unhide_all()
+            for collection in bpy.data.collections:
+                collection.hide_viewport = False
+                collection.hide_select = False
+        for obj in bpy.context.scene.objects:
+            obj.hide_select = False 
+            
+        
+                                                #Set up image output
+                                                          
+        bpy.context.scene.display_settings.display_device = 'sRGB'
+        bpy.context.scene.view_settings.view_transform = 'Standard'
+        bpy.context.scene.view_settings.look = 'Medium High Contrast'
+        
         
         #PREVIOUS COMPROBATIONS -----------------
+        #Check if the collections exist
+        if 'Collection' not in bpy.data.collections:
+            #Create the collection
+            collection = bpy.data.collections.new("Collection")
+            bpy.context.scene.collection.children.link(collection)
+        if 'rooms' not in bpy.data.collections:
+            self.report({'ERROR'}, "'rooms' collection not found, please rename or create collection 'rooms'")
+        if 'raycast' not in bpy.data.collections:
+            self.report({'ERROR'}, "'raycast' collection not found, please rename or create collection 'racycast'")
+
 
         #If both "rooms" and "raycast" collection exist
-        if 'raycast' in bpy.data.collections:
+        if 'raycast' in bpy.data.collections and 'rooms' in bpy.data.collections:
         #Check if the collections are not empty
             if is_collection_empty(self,context,'rooms'):
                 self.report({'ERROR'}, "No rooms, please move the rooms to the collection 'rooms'")
             if is_collection_empty(self,context,'raycast'):
-                self.report({'ERROR'}, "No raycast, please move the rooms to the collection 'raycast'")
+                self.report({'ERROR'}, "No raycast, please move the raycast to the collection 'raycast'")
             if is_collection_empty(self,context,'rooms') or is_collection_empty(self,context,'raycast'):
                 return {'FINISHED'}
         
             #Check for raycast in rooms collection
-                for obj in bpy.data.collections["rooms"].objects:
-                    if obj.data.name == "raycast":
-                        self.report({'ERROR'}, f"""Raycast model "{obj.name}" detected in rooms, please check the collections""")
-                        return {'FINISHED'}
-                    
-        
-            
+            for obj in bpy.data.collections["rooms"].objects:
+                if obj.data.name == "raycast":
+                    self.report({'ERROR'}, f"""Raycast model "{obj.name}" detected in rooms, please check the collections""")
+                    return {'FINISHED'}
+                
             #Check raycast name
             if len(bpy.data.collections["raycast"].objects) != 1:
                 self.report({'ERROR'}, "Only one raycast model allowed, please join all the objects in the collection 'raycast'")
@@ -760,13 +522,14 @@ class export_mirai(bpy.types.Operator):
                 if bpy.data.collections["raycast"].objects[0].data.name != "raycast":
                     
                     #Version that stops
-                    # self.report({'ERROR'}, "Raycast model must be named 'raycast'")
-                    # return {'FINISHED'}
+#                     self.report({'ERROR'}, "Raycast model must be named 'raycast'")
+#                     return {'FINISHED'}
 
                     #Version that renames
                     for mesh in bpy.data.meshes:
                         if mesh.name == "raycast":
                             bpy.data.meshes.remove(mesh)
+                            return {'FINISHED'}
 
                     bpy.data.collections["raycast"].objects[0].data.name = "raycast"
                     bpy.data.collections["raycast"].objects[0].name = "raycast"
@@ -775,7 +538,10 @@ class export_mirai(bpy.types.Operator):
             file_path = bpy.path.basename(bpy.context.blend_data.filepath)
             file_name = os.path.basename(file_path)
             if file_name == "":
-                self.report({'ERROR'}, "Save the file before exporting")
+                self.report({'ERROR'}, "Save the file before exporting")           
+            #check if hotel ID is empty
+            if not bpy.context.scene.filename: 
+                self.report({'ERROR'}, "hotel ID is empty")
                 return {'FINISHED'}
             else:
                 #Remove the extension
@@ -804,7 +570,9 @@ class export_mirai(bpy.types.Operator):
                     bpy.context.view_layer.layer_collection.children["rooms"].hide_viewport = False
                 for obj in bpy.data.collections["rooms"].objects:
                     bpy.context.view_layer.objects.active = obj
+                    # destroy_measure_cube(self,context)
                     obj.name = "Cube"
+                    obj.data.name = "Cube"
                     bpy.ops.object.mode_set(mode='EDIT')
                     bpy.ops.mesh.select_all(action='SELECT')
                     bpy.ops.uv.reset()
@@ -826,9 +594,9 @@ class export_mirai(bpy.types.Operator):
                 bpy.data.collections["raycast"].objects[0].data.materials.append(raycast_material)
 
             #Take screenshots
-            rooms_screenshot(self,context)
-            raycast_screenshot(self,context)
-            restoreView_and_save(self,context)
+#            rooms_screenshot(self,context)
+#            raycast_screenshot(self,context)
+#            restoreView_and_save(self,context)
 
             # #Show all collections
             for collection in bpy.data.collections:
@@ -844,6 +612,7 @@ class export_mirai(bpy.types.Operator):
                 obj.select_set(True)
             bpy.data.collections["raycast"].objects[0].select_set(True)
 
+            #Export
             bpy.ops.export_scene.gltf(  filepath=os.path.join(basedir+"u-"+bpy.context.scene.filename),
                                         check_existing=False,
                                         # export_import_convert_lighting_mode='SPEC',
@@ -971,7 +740,7 @@ class export_mirai(bpy.types.Operator):
 
                         #-END COMPROBATIONS -----------------
 
-
+# Only take rooms screenshot when raycast does not exist
                         
                     #Sets materials
                     material = create_material_with_texture()
@@ -981,7 +750,9 @@ class export_mirai(bpy.types.Operator):
                         obj.select_set(False)
                     for obj in bpy.data.collections["rooms"].objects:
                             bpy.context.view_layer.objects.active = obj
+                            #destroy_measure_cube(self,context)
                             obj.name = "Cube"
+                            obj.data.name = "Cube"
                             bpy.ops.object.mode_set(mode='EDIT')
                             bpy.ops.mesh.select_all(action='SELECT')
                             bpy.ops.uv.reset()
@@ -995,8 +766,8 @@ class export_mirai(bpy.types.Operator):
                                 obj.data.materials.append(material)
             
                         #Take screenshots
-                    rooms_screenshot(self,context)
-                    restoreView_and_save(self,context)
+#                    rooms_screenshot(self,context)
+#                    restoreView_and_save(self,context)
 
                         # #Show all collections
                     for collection in bpy.data.collections:
@@ -1010,7 +781,8 @@ class export_mirai(bpy.types.Operator):
                         #Select rooms objects
                     for obj in bpy.data.collections["rooms"].objects:
                             obj.select_set(True)
-
+                            
+                    #Export
                     bpy.ops.export_scene.gltf(  filepath=os.path.join(basedir+"u-"+bpy.context.scene.filename),
                                                     check_existing=False,
                                                     # export_import_convert_lighting_mode='SPEC',
@@ -1121,11 +893,230 @@ class export_mirai(bpy.types.Operator):
                     self.report({'INFO'}, "Exported to u-" + bpy.context.scene.filename +".glb")
                     return {'FINISHED'}
     
-PROPS = [
-    ("filename", bpy.props.StringProperty(name='',default="",description="HOTEL ID",maxlen=1024)),
-    ("measure_cube",bpy.props.BoolProperty(name="Measure cube", default=False, description="Measure cube")),
-]
+    
+class take_screenshots(bpy.types.Operator):
+    """Checks uvs of the cubes, sets up collections and exports to MiraiTwin"""
+    bl_label = "Take Screenshots"
+    bl_idname = "opr.take_screenshot"
+    bl_options = {'REGISTER', 'UNDO'}
 
+    def execute(self, context):
+    # Get the path where the blend file is located
+        basedir = bpy.path.abspath('//')
+
+    # Get file name:
+        filename = bpy.path.basename(bpy.context.blend_data.filepath)
+
+    # Remove .blend extension:
+        filename = os.path.splitext(filename)[0]
+        
+                # Unhide all and set selectable all
+        def get_outliner_area():
+            if bpy.context.area.type!='OUTLINER':
+                for area in bpy.context.screen.areas:
+                    if area.type == 'OUTLINER':
+                        return area
+
+        area = get_outliner_area()
+        region = next(region for region in area.regions if region.type == "WINDOW")
+
+        with bpy.context.temp_override(area=area, reigon=region):
+            bpy.ops.outliner.unhide_all()
+            for collection in bpy.data.collections:
+                collection.hide_viewport = False
+                collection.hide_select = False
+        for obj in bpy.context.scene.objects:
+            obj.hide_select = False 
+            
+        
+                                                #Set up image output
+                                                          
+        bpy.context.scene.display_settings.display_device = 'sRGB'
+        bpy.context.scene.view_settings.view_transform = 'Standard'
+        bpy.context.scene.view_settings.look = 'Medium High Contrast'
+        
+        
+        #PREVIOUS COMPROBATIONS -----------------
+        #Check if the collections exist
+        if 'Collection' not in bpy.data.collections:
+            #Create the collection
+            collection = bpy.data.collections.new("Collection")
+            bpy.context.scene.collection.children.link(collection)
+        if 'rooms' not in bpy.data.collections:
+            self.report({'ERROR'}, "'rooms' collection not found, please rename or create collection 'rooms'")
+        if 'raycast' not in bpy.data.collections:
+            self.report({'ERROR'}, "'raycast' collection not found, please rename or create collection 'racycast'")
+
+
+        #If both "rooms" and "raycast" collection exist
+        if 'raycast' in bpy.data.collections and 'rooms' in bpy.data.collections:
+        #Check if the collections are not empty
+            if is_collection_empty(self,context,'rooms'):
+                self.report({'ERROR'}, "No rooms, please move the rooms to the collection 'rooms'")
+            if is_collection_empty(self,context,'raycast'):
+                self.report({'ERROR'}, "No raycast, please move the raycast to the collection 'raycast'")
+            if is_collection_empty(self,context,'rooms') or is_collection_empty(self,context,'raycast'):
+                return {'FINISHED'}
+        
+            #Check for raycast in rooms collection
+            for obj in bpy.data.collections["rooms"].objects:
+                if obj.data.name == "raycast":
+                    self.report({'ERROR'}, f"""Raycast model "{obj.name}" detected in rooms, please check the collections""")
+                    return {'FINISHED'}
+                
+            #Check raycast name
+            if len(bpy.data.collections["raycast"].objects) != 1:
+                self.report({'ERROR'}, "Only one raycast model allowed, please join all the objects in the collection 'raycast'")
+            else:
+                if bpy.data.collections["raycast"].objects[0].data.name != "raycast":
+                    
+                    #Version that stops
+#                     self.report({'ERROR'}, "Raycast model must be named 'raycast'")
+ #                    return {'FINISHED'}
+
+                    #Version that renames
+                    for mesh in bpy.data.meshes:
+                        if mesh.name == "raycast":
+                            bpy.data.meshes.remove(mesh)
+                            return {'FINISHED'}
+
+                    bpy.data.collections["raycast"].objects[0].data.name = "raycast"
+                    bpy.data.collections["raycast"].objects[0].name = "raycast"
+
+            #file save check
+            file_path = bpy.path.basename(bpy.context.blend_data.filepath)
+            file_name = os.path.basename(file_path)
+            if file_name == "":
+                self.report({'ERROR'}, "Save the file before taking screenshots")
+                return {'FINISHED'}
+            else:
+                #Remove the extension
+                file_name = os.path.splitext(file_name)[0]
+
+            #-END COMPROBATIONS -----------------
+
+            #Sets materials
+            material = create_material_with_texture()
+            
+            #Reset uvs of all objetcs in rooms
+            for obj in bpy.data.objects:
+                obj.select_set(False)
+            def get_outliner_area():
+                if bpy.context.area.type!='OUTLINER':
+                    for area in bpy.context.screen.areas:
+                        if area.type == 'OUTLINER':
+                            return area
+
+            area = get_outliner_area()
+            region = next(region for region in area.regions if region.type == "WINDOW")
+
+            with bpy.context.temp_override(area=area, reigon=region):
+           
+                for collection in bpy.data.collections:
+                    bpy.context.view_layer.layer_collection.children["rooms"].hide_viewport = False
+                for obj in bpy.data.collections["rooms"].objects:
+                    bpy.context.view_layer.objects.active = obj
+                    # destroy_measure_cube(self,context)
+                    obj.name = "Cube"
+                    obj.data.name = "Cube"
+                    bpy.ops.object.mode_set(mode='EDIT')
+                    bpy.ops.mesh.select_all(action='SELECT')
+                    bpy.ops.uv.reset()
+                    bpy.ops.object.mode_set(mode='OBJECT')
+
+                #Adds material to the object
+                
+                if len(obj.data.materials) > 0:
+                    obj.data.materials[0] = material
+                else:
+                    obj.data.materials.append(material)
+            
+            #Sets raycast material
+            raycast_material = create_raycast_material()
+
+            if len(bpy.data.collections["raycast"].objects[0].data.materials ) > 0:
+                    bpy.data.collections["raycast"].objects[0].data.materials[0] = raycast_material
+            else:
+                bpy.data.collections["raycast"].objects[0].data.materials.append(raycast_material)
+
+            #Take screenshots
+            rooms_screenshot(self,context)
+            raycast_screenshot(self,context)
+            restoreView_and_save(self,context)
+
+            # #Show all collections
+            for collection in bpy.data.collections:
+                collection.hide_viewport = False
+
+            #Deselect all objects
+            for obj in bpy.data.objects:
+                obj.select_set(False) 
+            self.report({'INFO'}, "Screenshots taken")
+            return {'FINISHED'}
+            
+        else:
+                    if is_collection_empty(self,context,'rooms'):
+                        self.report({'ERROR'}, "No rooms, please move the rooms to the collection 'rooms'")
+                    if is_collection_empty(self,context,'rooms'):
+                        return {'FINISHED'}
+
+                        #file save check
+                    file_path = bpy.path.basename(bpy.context.blend_data.filepath)
+                    file_name = os.path.basename(file_path)
+                    if file_name == "":
+                            self.report({'ERROR'}, "Save the file before taking screenshotss")
+                            return {'FINISHED'}
+                    else:
+                            #Remove the extension
+                            file_name = os.path.splitext(file_name)[0]
+
+                        #-END COMPROBATIONS -----------------
+
+# Only take rooms screenshot when raycast does not exist
+                        
+                    #Sets materials
+                    material = create_material_with_texture()
+
+                    #Reset uvs of all objetcs in rooms
+                    for obj in bpy.data.objects:
+                        obj.select_set(False)
+                    for obj in bpy.data.collections["rooms"].objects:
+                            bpy.context.view_layer.objects.active = obj
+                            #destroy_measure_cube(self,context)
+                            obj.name = "Cube"
+                            obj.data.name = "Cube"
+                            bpy.ops.object.mode_set(mode='EDIT')
+                            bpy.ops.mesh.select_all(action='SELECT')
+                            bpy.ops.uv.reset()
+                            bpy.ops.object.mode_set(mode='OBJECT')
+
+                            #Adds material to the object
+                            
+                    if len(obj.data.materials) > 0:
+                                obj.data.materials[0] = material
+                    else:
+                                obj.data.materials.append(material)
+            
+                        #Take screenshots
+                    rooms_screenshot(self,context)
+                    restoreView_and_save(self,context)
+
+                        # #Show all collections
+                    for collection in bpy.data.collections:
+                            collection.hide_viewport = False
+
+                        #Deselect all objects
+                    for obj in bpy.data.objects:
+                            obj.select_set(False)
+                            # bpy.ops.object.select_all(action='DESELECT')    
+
+
+                    self.report({'INFO'}, "screenshots taken")
+                    return {'FINISHED'}
+                    
+PROPS = [
+    ("filename", bpy.props.StringProperty(name='Hotel ID',default="",description="HOTEL ID",maxlen=1024)),
+]
 
 #PANEL-----------------
 class OBJECT_PT_exporterMirai(bpy.types.Panel):
@@ -1138,47 +1129,24 @@ class OBJECT_PT_exporterMirai(bpy.types.Panel):
     
     def draw(self, context):
         layout = self.layout
-        
-        layout.label(text="Minh")
-        minhWf = layout.box()
-        col1 = minhWf.column()
-        row = col1.row()
-        row.operator('opr.add_cube_operator', text='Add measurement cube')
-
-
-        layout.label(text="Long")
-        longWf = layout.box()
-        col2 = longWf.column()
-        row = col2.row()
-        row.operator('opr.initial_setup', text='Initial setup')
-        row = col2.row()
-        row.operator('opr.center_origins_operator', text='Center origins')
-        row = col2.row()
-        row.operator('opr.center_oporigins_operator', text='Apply modifiers')
-
-
         layout.label(text="General")
         boxSetup = layout.box()
-      
         col3 = boxSetup.column()
+        row = col3.row()
+        row.operator('opr.initial_setup', text='Initial setup')
         row = col3.row()
         row.operator('opr.fix_rooms_operator', text='UV reset rooms')
         row = col3.row()
         row.prop(context.scene, "filename")
         row = col3.row()
         row.operator('opr.export_mirai_operator', text='Export') 
-
-  
-    
+        row = col3.row()
+        row.operator('opr.take_screenshot', text='Take Screenshots')
 
 #METHODS----------------- 
 
-
-
-        
-
 #Register the properties
-CLASSES = [OBJECT_PT_exporterMirai,export_mirai,fix_rooms,center_origins,apply_mod,add_cube,Initial_setup]
+CLASSES = [OBJECT_PT_exporterMirai,export_mirai,fix_rooms,Initial_setup,take_screenshots]
 
 def register():
 
