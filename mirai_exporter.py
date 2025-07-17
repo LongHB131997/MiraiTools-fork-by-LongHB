@@ -489,6 +489,10 @@ class export_mirai(bpy.types.Operator):
         
         #PREVIOUS COMPROBATIONS -----------------
         #Check if the collections exist
+        #check if hotel ID is empty
+        if not bpy.context.scene.filename: 
+            self.report({'ERROR'}, "hotel ID is empty")
+            return {'FINISHED'}
         if 'Collection' not in bpy.data.collections:
             #Create the collection
             collection = bpy.data.collections.new("Collection")
@@ -496,7 +500,7 @@ class export_mirai(bpy.types.Operator):
         if 'rooms' not in bpy.data.collections:
             self.report({'ERROR'}, "'rooms' collection not found, please rename or create collection 'rooms'")
         if 'raycast' not in bpy.data.collections:
-            self.report({'ERROR'}, "'raycast' collection not found, please rename or create collection 'racycast'")
+            self.report({'ERROR'}, "'raycast' collection not found, please create or rename if needed")
 
 
         #If both "rooms" and "raycast" collection exist
@@ -539,10 +543,7 @@ class export_mirai(bpy.types.Operator):
             file_name = os.path.basename(file_path)
             if file_name == "":
                 self.report({'ERROR'}, "Save the file before exporting")           
-            #check if hotel ID is empty
-            if not bpy.context.scene.filename: 
-                self.report({'ERROR'}, "hotel ID is empty")
-                return {'FINISHED'}
+
             else:
                 #Remove the extension
                 file_name = os.path.splitext(file_name)[0]
@@ -570,7 +571,7 @@ class export_mirai(bpy.types.Operator):
                     bpy.context.view_layer.layer_collection.children["rooms"].hide_viewport = False
                 for obj in bpy.data.collections["rooms"].objects:
                     bpy.context.view_layer.objects.active = obj
-                    # destroy_measure_cube(self,context)
+                    # destroy_measure_cube(self,context) (this is for a specific working pipeline from a team's member)
                     obj.name = "Cube"
                     obj.data.name = "Cube"
                     bpy.ops.object.mode_set(mode='EDIT')
@@ -722,10 +723,11 @@ class export_mirai(bpy.types.Operator):
     
             self.report({'INFO'}, "Exported to u-" + bpy.context.scene.filename +".glb")
             return {'FINISHED'}
+# Only export rooms when raycast does not exist
         else:
                     if is_collection_empty(self,context,'rooms'):
                         self.report({'ERROR'}, "No rooms, please move the rooms to the collection 'rooms'")
-                    if is_collection_empty(self,context,'rooms'):
+                    if is_collection_empty(self,context,'rooms'): 
                         return {'FINISHED'}
 
                         #file save check
@@ -740,7 +742,6 @@ class export_mirai(bpy.types.Operator):
 
                         #-END COMPROBATIONS -----------------
 
-# Only take rooms screenshot when raycast does not exist
                         
                     #Sets materials
                     material = create_material_with_texture()
@@ -750,7 +751,7 @@ class export_mirai(bpy.types.Operator):
                         obj.select_set(False)
                     for obj in bpy.data.collections["rooms"].objects:
                             bpy.context.view_layer.objects.active = obj
-                            #destroy_measure_cube(self,context)
+                            #destroy_measure_cube(self,context) (this is for a specific working pipeline from a team's member)
                             obj.name = "Cube"
                             obj.data.name = "Cube"
                             bpy.ops.object.mode_set(mode='EDIT')
@@ -945,7 +946,7 @@ class take_screenshots(bpy.types.Operator):
         if 'rooms' not in bpy.data.collections:
             self.report({'ERROR'}, "'rooms' collection not found, please rename or create collection 'rooms'")
         if 'raycast' not in bpy.data.collections:
-            self.report({'ERROR'}, "'raycast' collection not found, please rename or create collection 'racycast'")
+            self.report({'ERROR'}, "'raycast' collection not found, please create or rename if needed")
 
 
         #If both "rooms" and "raycast" collection exist
@@ -1016,7 +1017,7 @@ class take_screenshots(bpy.types.Operator):
                     bpy.context.view_layer.layer_collection.children["rooms"].hide_viewport = False
                 for obj in bpy.data.collections["rooms"].objects:
                     bpy.context.view_layer.objects.active = obj
-                    # destroy_measure_cube(self,context)
+                    # destroy_measure_cube(self,context) (this is for a specific working pipeline from a team's member)
                     obj.name = "Cube"
                     obj.data.name = "Cube"
                     bpy.ops.object.mode_set(mode='EDIT')
@@ -1053,7 +1054,7 @@ class take_screenshots(bpy.types.Operator):
                 obj.select_set(False) 
             self.report({'INFO'}, "Screenshots taken")
             return {'FINISHED'}
-            
+# Only take rooms screenshot when raycast does not exist          
         else:
                     if is_collection_empty(self,context,'rooms'):
                         self.report({'ERROR'}, "No rooms, please move the rooms to the collection 'rooms'")
@@ -1072,7 +1073,7 @@ class take_screenshots(bpy.types.Operator):
 
                         #-END COMPROBATIONS -----------------
 
-# Only take rooms screenshot when raycast does not exist
+
                         
                     #Sets materials
                     material = create_material_with_texture()
@@ -1082,7 +1083,7 @@ class take_screenshots(bpy.types.Operator):
                         obj.select_set(False)
                     for obj in bpy.data.collections["rooms"].objects:
                             bpy.context.view_layer.objects.active = obj
-                            #destroy_measure_cube(self,context)
+                            #destroy_measure_cube(self,context) (this is for a specific working pipeline from a team's member)
                             obj.name = "Cube"
                             obj.data.name = "Cube"
                             bpy.ops.object.mode_set(mode='EDIT')
