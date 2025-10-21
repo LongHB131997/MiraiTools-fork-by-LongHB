@@ -268,7 +268,6 @@ def create_material_with_texture():
     
     # Enable transparency in material settings
     material.blend_method = 'BLEND'
-    material.shadow_method = 'CLIP'
 
     #Set viewport color
     material.diffuse_color = (1.0, 1.0, 1.0, 0.2)
@@ -597,7 +596,7 @@ class export_mirai(bpy.types.Operator):
             #Take screenshots
 #            rooms_screenshot(self,context)
 #            raycast_screenshot(self,context)
-#            restoreView_and_save(self,context)
+            restoreView_and_save(self,context)
 
             # #Show all collections
             for collection in bpy.data.collections:
@@ -768,7 +767,7 @@ class export_mirai(bpy.types.Operator):
             
                         #Take screenshots
 #                    rooms_screenshot(self,context)
-#                    restoreView_and_save(self,context)
+                    restoreView_and_save(self,context)
 
                         # #Show all collections
                     for collection in bpy.data.collections:
@@ -893,6 +892,7 @@ class export_mirai(bpy.types.Operator):
                         
                     self.report({'INFO'}, "Exported to u-" + bpy.context.scene.filename +".glb")
                     return {'FINISHED'}
+
     
     
 class take_screenshots(bpy.types.Operator):
